@@ -1,4 +1,5 @@
-require('@electron/remote/main').initialize()
+const remoteMain = require('@electron/remote/main')
+remoteMain.initialize()
 
 // Requirements
 const { app, BrowserWindow, ipcMain, Menu } = require('electron')
@@ -87,9 +88,6 @@ ipcMain.on('distributionIndexDone', (event, res) => {
 // https://electronjs.org/docs/tutorial/offscreen-rendering
 app.disableHardwareAcceleration()
 
-// https://github.com/electron/electron/issues/18397
-app.allowRendererProcessReuse = true
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -104,11 +102,11 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, 'app', 'assets', 'js', 'preloader.js'),
             nodeIntegration: true,
-            contextIsolation: false,
-            enableRemoteModule: true
+            contextIsolation: false
         },
         backgroundColor: '#171614'
     })
+    remoteMain.enable(win.webContents)
 
     ejse.data('bkid', Math.floor((Math.random() * fs.readdirSync(path.join(__dirname, 'app', 'assets', 'images', 'backgrounds')).length)))
 
